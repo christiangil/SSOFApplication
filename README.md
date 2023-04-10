@@ -1,5 +1,7 @@
 # SSOFApplication
 
-![SSOF and NEID logos](https://raw.githubusercontent.com/christiangil/SSOFApplication/master/ssof_neid.PNG)
+<p align="center">
+    <img width="800px" src="https://raw.githubusercontent.com/christiangil/SSOFApplication/main/ssof_neid.png"/>
+</p>
 
 Using StellarSpectraObservationFitting.jl (SSOF) on data from extremely precise radial velocity spectrographs
