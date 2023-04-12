@@ -8,6 +8,28 @@ using CSV, DataFrames, Query, StatsBase, Statistics, Dates
 using FITSIO
 using Plots
 
+
+"""
+	collect_filenames(dir)
+
+Recursively collect all of the Filename files from the manifest.csv files contained in `dir` and its subdirectories
+"""
+function collect_filenames(dir::String)
+	fnlist = String[]
+	collect_filenames!(fnlist, dir::String)
+	return fnlist
+end
+function collect_filenames!(fnlist::Vector{<:String}, dir::String)
+    if isdir(dir)
+        for d in readdir(dir)
+            collect_filenames!(fnlist, dir * "/" * d)
+        end
+    elseif !isnothing(match(r".*manifest.csv", dir))
+        append!(fnlist, CSV.read(dir, DataFrame).Filename)
+    end
+end
+
+
 """
 	make_manifest_neid(filenames)
 
