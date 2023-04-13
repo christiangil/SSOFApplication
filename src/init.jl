@@ -14,18 +14,20 @@ using Plots
 
 Recursively collect all of the Filename files from the manifest.csv files contained in `dir` and its subdirectories
 """
-function collect_filenames(dir::String)
+function collect_filenames(dir::String; kwargs...)
 	fnlist = String[]
-	collect_filenames!(fnlist, dir::String)
+	collect_filenames!(fnlist, dir::String; kwargs...)
 	return fnlist
 end
-function collect_filenames!(fnlist::Vector{<:String}, dir::String)
+function collect_filenames!(fnlist::Vector{<:String}, dir::String; look_for_manifest::Bool=true)
     if isdir(dir)
         for d in readdir(dir)
             collect_filenames!(fnlist, dir * "/" * d)
         end
-    elseif !isnothing(match(r".*manifest.csv", dir))
+    elseif look_for_manifest && !isnothing(match(r".*manifest\.csv", dir))
         append!(fnlist, CSV.read(dir, DataFrame).Filename)
+	elseif !look_for_manifest && !isnothing(match(r".*\.fits", dir))
+        append!(fnlist, [dir])
     end
 end
 
