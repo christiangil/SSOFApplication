@@ -22,7 +22,7 @@ end
 function collect_filenames!(fnlist::Vector{<:String}, dir::String; look_for_manifest::Bool=true)
     if isdir(dir)
         for d in readdir(dir)
-            collect_filenames!(fnlist, dir * "/" * d)
+            collect_filenames!(fnlist, dir * "/" * d; look_for_manifest=look_for_manifest)
         end
     elseif look_for_manifest && !isnothing(match(r".*manifest\.csv", dir))
         append!(fnlist, CSV.read(dir, DataFrame).Filename)
@@ -30,7 +30,6 @@ function collect_filenames!(fnlist::Vector{<:String}, dir::String; look_for_mani
         append!(fnlist, [dir])
     end
 end
-
 
 """
 	make_manifest_neid(filenames)
