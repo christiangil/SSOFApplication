@@ -11,17 +11,21 @@ using FITSIO
 import SSOFApplication as SSOFA
 
 # parsing inputs
+if length(ARGS) != 0; ENV["GKSwstype"] = "100" end
 csv_with_filenames = ARGS[1]
 path_to_save_to = ARGS[2]
+max_spectra_to_use = parse(Int, ARGS[3])
 
 # creating manifest of files
 df_filenames = CSV.read(csv_with_filenames, DataFrame)
 # df_filenames = make_manifest(df_filenames)
 df_files = SSOFA.make_manifest_neid(df_filenames[:, 1])
-df_files_use = SSOFA.filter_manifest_neid(df_files, max_spectra_to_use=200)
+df_files_use = SSOFA.filter_manifest_neid(df_files, max_spectra_to_use=max_spectra_to_use)
 
 # defines NEIDLSF.NEID_lsf()
 include("lsf.jl") 
+
+mkpath(path_to_save_to)
 
 # reformating spectra into SSOF Data objects
 SSOFA.reformat_spectra(
