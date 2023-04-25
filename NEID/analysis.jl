@@ -13,7 +13,7 @@ using DataFrames, CSV
 data_path = ARGS[1]  # something like "C:/path/to/data/*order*/data.jld2"
 base_path = ARGS[2]  # something like "C:/path/to/results/*order*/"
 pipeline_path = ARGS[3]  # something like "C:/path/to/data/neid_pipeline.jld2"
-desired_order = SSOF.parse_args(4, Int, 81)  # used for plots and correct regularizaiton lengthscale
+desired_order = SSOF.parse_args(4, Int, 81)  # used for plots and correct regularization lengthscale
 
 # optional inputs
 star = SSOF.parse_args(5, String, "")  # used for plot titles
