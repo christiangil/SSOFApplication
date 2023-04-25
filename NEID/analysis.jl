@@ -10,48 +10,31 @@ using Plots
 using DataFrames, CSV
 
 ## Setting up necessary variables
+data_path = ARGS[1]  # something like "C:/path/to/data/*order*/data.jld2"
+base_path = ARGS[2]  # something like "C:/path/to/results/*order*/"
+pipeline_path = ARGS[3]  # something like "C:/path/to/data/neid_pipeline.jld2"
+desired_order = SSOF.parse_args(4, Int, 81)  # used for plots and correct regularizaiton lengthscale
 
-stars = ["26965", "3651", "Barnard"]
-stars_str = ["HD 26965", "HD 3651", "Barnard's Star"]
-star_choice = SSOF.parse_args(1, Int, 1)
-star = stars[star_choice]
-star_str = stars_str[star_choice]
-solar = star_choice > 5
+# optional inputs
+star = SSOF.parse_args(5, String, "")  # used for plot titles
+n_comp_tel, n_comp_star, use_custom_n_comp =
+	SSOFA.how_many_comps(SSOF.parse_args(6, String, ""))
+use_custom_n_comp = SSOF.parse_args(7, Bool, false) && use_custom_n_comp
+recalc = SSOF.parse_args(8, Bool, true)
+log_lm = SSOF.parse_args(9, Bool, true)
+dpca = SSOF.parse_args(10, Bool, false)
+use_lsf = SSOF.parse_args(11, Bool, true)
+use_reg = SSOF.parse_args(12, Bool, true)
+
 interactive = length(ARGS) == 0
 if !interactive; ENV["GKSwstype"] = "100" end
-include("data_locs.jl")  # defines neid_data_path and neid_save_path
-desired_order = SSOF.parse_args(2, Int, 81)
-log_lm = SSOF.parse_args(3, Bool, true)
-dpca = SSOF.parse_args(4, Bool, false)
-use_lsf = SSOF.parse_args(5, Bool, true)
-recalc = SSOF.parse_args(6, Bool, true)
-n_comp_tel, n_comp_star, use_custom_n_comp, recalc =
-	SSOFA.how_many_comps(SSOF.parse_args(7, String, ""), recalc, desired_order)
-save_folder = SSOF.parse_args(8, String, "aic")
-use_custom_n_comp = SSOF.parse_args(9, Bool, false) && use_custom_n_comp
-use_reg = SSOF.parse_args(10, Bool, true)
-which_opt = SSOF.parse_args(11, Int, 1)
-opt = SSOFA.valid_optimizers[which_opt]
-
-## Loading in data and initializing model
-base_path = neid_save_path * star * "/$(desired_order)/"
-data_path = base_path * "data.jld2"
-log_lm ? base_path *= "log_" : base_path *= "lin_"
-dpca ? base_path *= "dcp_" : base_path *= "vil_"
-use_lsf ? base_path *= "lsf/" : base_path *= "nol/"
-mkpath(base_path)
-if save_folder != ""
-	base_path *= save_folder * "/"
-	mkpath(base_path)
-end
 save_path = base_path * "results.jld2"
-pipeline_path = neid_save_path * star * "/neid_pipeline.jld2"
 
 data, times_nu, airmasses = SSOFA.get_data(data_path; use_lsf=use_lsf)
 times_nu .-= 2400000.5
 
 model = SSOFA.calculate_initial_model(data;
-	instrument="NEID", desired_order=desired_order, star=star, times=times_nu;
+	instrument="NEID", desired_order=desired_order, star=star, times=times_nu,
 	n_comp_tel=n_comp_tel, n_comp_star=n_comp_star, save_fn=save_path, plots_fn=base_path,
 	recalc=recalc, use_reg=use_reg, use_custom_n_comp=use_custom_n_comp,
 	dpca=dpca, log_lm=log_lm, log_λ_gp_star=1/SSOF.SOAP_gp_params.λ,
@@ -59,13 +42,14 @@ model = SSOFA.calculate_initial_model(data;
 	log_λ_gp_tel=1/SSOFA.neid_temporal_gp_lsf_λ(desired_order),
 	careful_first_step=true, speed_up=false)
 
-if all(isone.(model.tel.lm.μ)) && !SSOF.is_time_variable(model.tel); opt = "frozen-tel" end
+SSOF.no_tellurics(model) ? opt = "frozen-tel" : opt = "adam"
+
 mws = SSOFA.create_workspace(model, data, opt)
 mkpath(base_path*"noreg/")
 df_act = SSOFA.neid_activity_indicators(pipeline_path, data)  # fix this so it doesn't rely on what is in folder only
 if !mws.om.metadata[:todo][:reg_improved]
 	SSOFA.neid_plots(mws, airmasses, times_nu, SSOF.rvs(mws.om), zeros(length(times_nu)), base_path*"noreg/", pipeline_path, desired_order;
-		display_plt=interactive, df_act=df_act, title=star_str);
+		display_plt=interactive, df_act=df_act, title=star);
 end
 
 SSOFA.improve_regularization!(mws; save_fn=save_path, careful_first_step=true, speed_up=false)
@@ -76,9 +60,8 @@ rvs_b, rv_errors_b, tel_s_b, tel_errors_b, star_s_b, star_errors_b = SSOFA.estim
 
 ## Plots
 # SSOFA.neid_plots(mws, airmasses, times_nu, rvs_b, rv_errors_b, base_path, pipeline_path, desired_order;
-# 	display_plt=interactive, df_act=df_act, tel_errors=tel_errors_b, star_errors=star_errors_b, title=star_str);
+# 	display_plt=interactive, df_act=df_act, tel_errors=tel_errors_b, star_errors=star_errors_b, title=star);
 SSOFA.neid_plots(mws, airmasses, times_nu, rvs, rv_errors, base_path, pipeline_path, desired_order;
-	display_plt=interactive, df_act=df_act, tel_errors=tel_errors, star_errors=star_errors, title=star_str);
-
+	display_plt=interactive, df_act=df_act, tel_errors=tel_errors, star_errors=star_errors, title=star);
 
 

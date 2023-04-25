@@ -333,32 +333,10 @@ function estimate_σ_bootstrap(mws::SSOF.ModelWorkspace; recalc::Bool=false, sav
 end
 
 
-function how_many_comps(str::String, recalc::Bool, desired_order::Int)
-
-	# they said to look for a file
-	if isfile(str)
-		df_n_comp = DataFrame(CSV.File(str))
-		i_df = SSOF.int2ind(df_n_comp.order, desired_order)
-		@assert df_n_comp[i_df, :order] == desired_order
-		function look(field, default)
-			try
-				return df_n_comp[i_df, field]
-			catch err
-				if typeof(err) <: ArgumentError
-					return default
-				end
-			end
-		end
-		use_custom_n_comp = look(:redo, true)
-		recalc = recalc || use_custom_n_comp
-		n_comp_tel = look(:n_tel_by_eye, 5)
-		n_comp_star = look(:n_star_by_eye, 5)
-		# better_model = look(:better_model, 1)
-		# remove_reciprocal_continuum = look(:has_reciprocal_continuum, false)
-		println("using $n_comp_tel telluric components and $n_comp_star stellar components from " * str)
+function how_many_comps(str::String)
 
 	# they passed a proposed amount of parameters
-	elseif length(str) > 0 && str[1] == '[' && str[end] == ']'
+	if length(str) > 0 && str[1] == '[' && str[end] == ']'
 		matches = [parse(Int64, t.match) for t in eachmatch(r"-?[0-9]+", str)]
 		@assert length(matches) == 2 "should only pass things of the form [n_comps_tel::Int, n_comps_star::Int]"
 		n_comp_tel = matches[1]
@@ -378,5 +356,35 @@ function how_many_comps(str::String, recalc::Bool, desired_order::Int)
 		println("using $n_comp_tel telluric components and $n_comp_star stellar components (the default)")
 	end
 
-	return n_comp_tel, n_comp_star, use_custom_n_comp, recalc
+	return n_comp_tel, n_comp_star, use_custom_n_comp
+end
+
+function how_many_comps(str::String, desired_order::Int)
+
+	# they said to look for a file
+	if isfile(str)
+		df_n_comp = DataFrame(CSV.File(str))
+		i_df = SSOF.int2ind(df_n_comp.order, desired_order)
+		@assert df_n_comp[i_df, :order] == desired_order
+		function look(field, default)
+			try
+				return df_n_comp[i_df, field]
+			catch err
+				if typeof(err) <: ArgumentError
+					return default
+				end
+			end
+		end
+		use_custom_n_comp = look(:redo, true)
+		# recalc = recalc || use_custom_n_comp
+		n_comp_tel = look(:n_tel_by_eye, 5)
+		n_comp_star = look(:n_star_by_eye, 5)
+		# better_model = look(:better_model, 1)
+		# remove_reciprocal_continuum = look(:has_reciprocal_continuum, false)
+		println("using $n_comp_tel telluric components and $n_comp_star stellar components from " * str)
+
+		return n_comp_tel, n_comp_star, use_custom_n_comp
+	else
+		return how_many_comps(str)
+	end
 end
