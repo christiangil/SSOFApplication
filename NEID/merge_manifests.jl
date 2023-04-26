@@ -1,7 +1,7 @@
 ## Setup
-using Pkg
-Pkg.activate("NEID")
-Pkg.instantiate()
+# using Pkg
+# Pkg.activate("NEID")
+# Pkg.instantiate()
 
 ## Importing
 using CSV, DataFrames

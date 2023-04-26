@@ -1,7 +1,7 @@
 ## Setup
-using Pkg
-Pkg.activate("NEID")
-Pkg.instantiate()
+#using Pkg
+#Pkg.activate("NEID")
+#Pkg.instantiate()
 
 ## Importing data with Eric's code
 import StellarSpectraObservationFitting as SSOF
