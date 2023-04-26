@@ -1,6 +1,7 @@
 ## Importing packages
 using Pkg
 Pkg.activate("NEID")
+# Pkg.develop(;path=".")
 
 import StellarSpectraObservationFitting as SSOF
 import SSOFApplication as SSOFA
