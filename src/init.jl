@@ -25,8 +25,11 @@ function collect_filenames!(fnlist::Vector{<:String}, dir::String; look_for_mani
             collect_filenames!(fnlist, dir * "/" * d; look_for_manifest=look_for_manifest)
         end
     elseif look_for_manifest && !isnothing(match(r".*manifest\.csv", dir))
-        append!(fnlist, CSV.read(dir, DataFrame).Filename)
-	elseif !look_for_manifest && !isnothing(match(r".*\.fits", dir))
+        df = CSV.read(dir, DataFrame)
+	if (prod(size(df)) >= 1) && (in("Filename",names(df)))
+	append!(fnlist, df.Filename)
+	end
+    elseif !look_for_manifest && !isnothing(match(r".*\.fits", dir))
         append!(fnlist, [dir])
     end
 end
