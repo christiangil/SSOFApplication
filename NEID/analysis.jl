@@ -1,12 +1,7 @@
 ## Importing packages
-<<<<<<< HEAD
-#using Pkg
-#Pkg.activate("NEID")
-=======
-using Pkg
-Pkg.activate("NEID")
-# Pkg.develop(;path=".")
->>>>>>> 15841aec3429603a9d2d5a3b7bdc3ae6bba92d27
+# using Pkg
+# Pkg.activate("NEID")
+# Pkg.instantiate()
 
 import StellarSpectraObservationFitting as SSOF
 import SSOFApplication as SSOFA
@@ -46,7 +41,7 @@ data, times_nu, airmasses = SSOFA.get_data(filename_order_data; use_lsf=use_lsf)
 times_nu .-= 2400000.5
 
 model = SSOFA.calculate_initial_model(data;
-	instrument="NEID", desired_order_index=desired_order_index, star=star, times=times_nu,
+	instrument="NEID", desired_order=desired_order_index, star=star, times=times_nu,
 	n_comp_tel=n_comp_tel, n_comp_star=n_comp_star, save_fn=save_path, plots_fn=base_output_path,
 	recalc=recalc, use_reg=use_reg, use_custom_n_comp=use_custom_n_comp,
 	dpca=dpca, log_lm=log_lm, log_λ_gp_star=1/SSOF.SOAP_gp_params.λ,
