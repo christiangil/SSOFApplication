@@ -27,9 +27,9 @@ error_results_jld2_jld2_full_fns = [results_save_path*"/$order/$error_results_jl
 results_jld2_full_fns = [results_save_path*"/$order/$results_jld2_fn" for order in orders]
 data_jld2_full_fns = [data_save_path*"/$order/$data_jld2_fn" for order in orders]
 
-@assert any(isjld2.(error_results_jld2_jld2_full_fns)) "No error results .jld2 files found"
-@assert any(isjld2.(results_jld2_full_fns)) "No results .jld2 files found"
-@assert any(isjld2.(data_jld2_full_fns)) "No data .jld2 files found"
+@assert any(SSOFA.isjld2.(error_results_jld2_jld2_full_fns)) "No error results .jld2 files found"
+@assert any(SSOFA.isjld2.(results_jld2_full_fns)) "No results .jld2 files found"
+@assert any(SSOFA.isjld2.(data_jld2_full_fns)) "No data .jld2 files found"
 
 SSOFA.retrieve(
     gathered_jld2_fn,

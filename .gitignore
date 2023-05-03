@@ -33,3 +33,6 @@ Manifest.toml
 *.txt
 # *.fits
 *.par
+NEID/old/
+NEID/glom/
+*scrap.jl
