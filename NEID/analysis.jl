@@ -1,7 +1,7 @@
 ## Importing packages
-# using Pkg
-# Pkg.activate("NEID")
-# Pkg.instantiate()
+#using Pkg
+#Pkg.activate("NEID")
+# Pkg.develop(;path=".")
 
 import StellarSpectraObservationFitting as SSOF
 import SSOFApplication as SSOFA
@@ -17,8 +17,8 @@ desired_order_index = SSOF.parse_args(3, Int, 81)  # used for plots and correct 
 base_output_path = ARGS[4]  # something like "C:/path/to/results/*order*/"
 
 # making sure the inputs make sense
-@assert isfile(filename_order_data) && filename_order_data[end-4:end]==".jld2" "filename_order_data is not a .jld2 file"
-@assert isfile(filename_of_indicators) && filename_of_indicators[end-4:end]==".jld2" "filename_of_indicators is not a .jld2 file"
+@assert isjld2(filename_order_data) "filename_order_data is not a .jld2 file"
+@assert isjld2(filename_of_indicators) "filename_of_indicators is not a .jld2 file"
 @assert 4 <= desired_order_index <= 120 "desired_order_index is not in the right range for NEID"
 @assert isdir(base_output_path) "base_output_path for output does not point to a directory"
 
@@ -41,7 +41,7 @@ data, times_nu, airmasses = SSOFA.get_data(filename_order_data; use_lsf=use_lsf)
 times_nu .-= 2400000.5
 
 model = SSOFA.calculate_initial_model(data;
-	instrument="NEID", desired_order=desired_order_index, star=star, times=times_nu,
+	instrument="NEID", desired_order_index=desired_order_index, star=star, times=times_nu,
 	n_comp_tel=n_comp_tel, n_comp_star=n_comp_star, save_fn=save_path, plots_fn=base_output_path,
 	recalc=recalc, use_reg=use_reg, use_custom_n_comp=use_custom_n_comp,
 	dpca=dpca, log_lm=log_lm, log_λ_gp_star=1/SSOF.SOAP_gp_params.λ,
