@@ -292,9 +292,11 @@ function status_plot(mws::SSOF.ModelWorkspace; tracker::Int=0, display_plt::Bool
     # plot!(plt[1], obs_λ, time_average(o.total) .- shift, label="Mean Full Model", color=base_color)
 
     _scatter!(plt[2], obs_λ[obs_mask], time_average(abs.(view(d.flux, obs_mask, :) - view(o.total, obs_mask, :))), ylabel="MAD", label="", alpha=0.5, color=base_color, xlabel="", ms=1.5)
+	plot!(plt[2], obs_λ, sqrt(2/π) .* mean(sqrt.(d.var); dims=2); label="", c=plt_colors[3], lw=2);
 
 	if include_χ²
 		_scatter!(plt[3], obs_λ, -sum(SSOF._loss_diagnostic(mws); dims=2), ylabel="Remaining χ²", label="", alpha=0.5, color=base_color, xlabel="", ms=1.5)
+		hline!(plt[3], [-size(d.var, 2)]; label="", c=plt_colors[3], lw=2)
 	end
 
     if display_plt; display(plt) end
