@@ -19,8 +19,16 @@ max_spectra_to_use = parse(Int, ARGS[3])
 # creating manifest of files
 df_filenames = CSV.read(csv_with_filenames, DataFrame)
 # df_filenames = make_manifest(df_filenames)
+if !(size(df_filenames,1)>=1)
+   println("# Exiting early because no manifest files found.")
+   exit(0)
+end
 df_files = SSOFA.make_manifest_neid(df_filenames[:, 1])
 df_files_use = SSOFA.filter_manifest_neid(df_files, max_spectra_to_use=max_spectra_to_use)
+if !(size(df_files_use,1)>=4)
+   println("# Exiting early because only " * string(size(df_files_use,1)) * " files found for use by SSOF.")
+   exit(0)
+end
 
 # defines NEIDLSF.NEID_lsf()
 include("lsf.jl") 
