@@ -98,11 +98,15 @@ end
 function retrieve(save_fns::Vector{String}, rv_fns::Vector{Vector{String}}, model_fns::Vector{Vector{String}}, data_fns::Vector{Vector{String}})
     @assert length(rv_fns) == length(save_fns) == length(data_fns) == length(model_fns)
     for i in eachindex(save_fns)
-        @load data_fns[i][1] n_obs times_nu airmasses
-        n_ord = length(rv_fns[i])
-        rvs, rvs_σ, constant, no_tel, wavelength_range, wavelength_range_star, all_star_s, all_tel_s = retrieve(n_obs, rv_fns[i], model_fns[i], data_fns[i])
-        @save save_fns[i] n_obs times_nu airmasses n_ord rvs rvs_σ constant no_tel wavelength_range wavelength_range_star all_star_s all_tel_s
+        retrieve(save_fns[i], rv_fns[i], model_fns[i], data_fns[i])
     end
+end
+
+function retrieve(save_fn::String, rv_fns::Vector{String}, model_fns::Vector{String}, data_fns::Vector{String})
+    @load data_fns[1] n_obs times_nu airmasses
+    n_ord = length(rv_fns)
+    rvs, rvs_σ, constant, no_tel, wavelength_range, wavelength_range_star, all_star_s, all_tel_s = retrieve(n_obs, rv_fns, model_fns, data_fns)
+    @save save_fn n_obs times_nu airmasses n_ord rvs rvs_σ constant no_tel wavelength_range wavelength_range_star all_star_s all_tel_s
 end
 
 
