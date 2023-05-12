@@ -1313,7 +1313,9 @@ version = "0.6.38"
 
 [[deps.SSOFApplication]]
 deps = ["CSV", "DataFrames", "Dates", "EchelleCCFs", "EchelleInstruments", "FITSIO", "JLD2", "LaTeXStrings", "LinearAlgebra", "Plots", "Query", "RvSpectML", "RvSpectMLBase", "Statistics", "StatsBase", "StellarSpectraObservationFitting"]
-path = ".."
+git-tree-sha1 = "5a63bd73f6c8d9a33e16aaa77a7b706c0b2020f6"
+repo-rev = "main"
+repo-url = ".."
 uuid = "fc75f9f1-43c3-436d-90f8-a4e4bacb1b17"
 version = "0.0.1"
 
