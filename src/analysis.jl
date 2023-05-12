@@ -388,3 +388,6 @@ function how_many_comps(str::String, desired_order::Int)
 		return how_many_comps(str)
 	end
 end
+
+
+isjld2(s::String) = (isfile(s) && s[end-4:end]==".jld2")

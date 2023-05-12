@@ -1,7 +1,7 @@
 ## Importing packages
-# using Pkg
-# Pkg.activate("NEID")
-# Pkg.instantiate()
+#using Pkg
+#Pkg.activate("NEID")
+# Pkg.develop(;path=".")
 
 import StellarSpectraObservationFitting as SSOF
 import SSOFApplication as SSOFA
@@ -12,13 +12,13 @@ using DataFrames, CSV
 
 # parsing necessary inputs
 filename_order_data = ARGS[1]  # something like "C:/path/to/data/*order*/data.jld2"
-filename_of_indicators = ARGS[2]  # something like "C:/path/to/data/neid_pipeline.jld2"
+neid_drp_jld2 = ARGS[2]  # something like "C:/path/to/data/neid_pipeline.jld2"
 desired_order_index = SSOF.parse_args(3, Int, 81)  # used for plots and correct regularization lengthscale
 base_output_path = ARGS[4]  # something like "C:/path/to/results/*order*/"
 
 # making sure the inputs make sense
-@assert isfile(filename_order_data) && filename_order_data[end-4:end]==".jld2" "filename_order_data is not a .jld2 file"
-@assert isfile(filename_of_indicators) && filename_of_indicators[end-4:end]==".jld2" "filename_of_indicators is not a .jld2 file"
+@assert SSOFA.isjld2(filename_order_data) "filename_order_data is not a .jld2 file"
+@assert SSOFA.isjld2(neid_drp_jld2) "neid_drp_jld2 is not a .jld2 file"
 @assert 4 <= desired_order_index <= 120 "desired_order_index is not in the right range for NEID"
 @assert isdir(base_output_path) "base_output_path for output does not point to a directory"
 
@@ -41,7 +41,7 @@ data, times_nu, airmasses = SSOFA.get_data(filename_order_data; use_lsf=use_lsf)
 times_nu .-= 2400000.5
 
 model = SSOFA.calculate_initial_model(data;
-	instrument="NEID", desired_order=desired_order_index, star=star, times=times_nu,
+	instrument="NEID", desired_order_index=desired_order_index, star=star, times=times_nu,
 	n_comp_tel=n_comp_tel, n_comp_star=n_comp_star, save_fn=save_path, plots_fn=base_output_path,
 	recalc=recalc, use_reg=use_reg, use_custom_n_comp=use_custom_n_comp,
 	dpca=dpca, log_lm=log_lm, log_λ_gp_star=1/SSOF.SOAP_gp_params.λ,
@@ -53,9 +53,9 @@ SSOF.no_tellurics(model) ? opt = "frozen-tel" : opt = "adam"
 
 mws = SSOFA.create_workspace(model, data, opt)
 mkpath(base_output_path*"noreg/")
-df_act = SSOFA.neid_activity_indicators(filename_of_indicators, data)  # fix this so it doesn't rely on what is in folder only
+df_act = SSOFA.neid_activity_indicators(neid_drp_jld2, data)  # fix this so it doesn't rely on what is in folder only
 if !mws.om.metadata[:todo][:reg_improved]
-	SSOFA.neid_plots(mws, airmasses, times_nu, SSOF.rvs(mws.om), zeros(length(times_nu)), base_output_path*"noreg/", filename_of_indicators, desired_order_index;
+	SSOFA.neid_plots(mws, airmasses, times_nu, SSOF.rvs(mws.om), zeros(length(times_nu)), base_output_path*"noreg/", neid_drp_jld2, desired_order_index;
 		display_plt=interactive, df_act=df_act, title=star);
 end
 
@@ -66,7 +66,7 @@ mws.om.metadata[:todo][:err_estimated] = true
 rvs_b, rv_errors_b, tel_s_b, tel_errors_b, star_s_b, star_errors_b = SSOFA.estimate_σ_bootstrap(mws; save_fn=base_output_path * "results_boot.jld2", save_model_fn=save_path, recalc_mean=true, recalc=recalc, return_holders=true)
 
 ## Plots
-# SSOFA.neid_plots(mws, airmasses, times_nu, rvs_b, rv_errors_b, base_output_path, filename_of_indicators, desired_order_index;
+# SSOFA.neid_plots(mws, airmasses, times_nu, rvs_b, rv_errors_b, base_output_path, neid_drp_jld2, desired_order_index;
 # 	display_plt=interactive, df_act=df_act, tel_errors=tel_errors_b, star_errors=star_errors_b, title=star);
-SSOFA.neid_plots(mws, airmasses, times_nu, rvs, rv_errors, base_output_path, filename_of_indicators, desired_order_index;
+SSOFA.neid_plots(mws, airmasses, times_nu, rvs, rv_errors, base_output_path, neid_drp_jld2, desired_order_index;
 	display_plt=interactive, df_act=df_act, tel_errors=tel_errors, star_errors=star_errors, title=star);
