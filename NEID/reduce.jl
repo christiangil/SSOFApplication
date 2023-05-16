@@ -1,7 +1,8 @@
 ## Importing packages
-using Pkg
-Pkg.activate("NEID")
-Pkg.instantiate()
+# using Pkg
+# Pkg.activate("NEID")
+# Pkg.instantiate()
+
 import NaNMath as nm
 using JLD2
 import StellarSpectraObservationFitting as SSOF
@@ -61,8 +62,8 @@ println("$(length(best_ords_i) - length(inds_key1)) orders ignored for having >$
 println("$(length(inds_key1)) orders used in total")
 rvs_red = collect(Iterators.flatten((sum(rvs[inds_key1, :] ./ (rvs_σ[inds_key1, :] .^ 2); dims=1) ./ sum(1 ./ (rvs_σ[inds_key1, :] .^ 2); dims=1))'))
 rvs_red .-= median(rvs_red)
-rvs_σ_red = collect(Iterators.flatten(1 ./ sqrt.(sum(1 ./ (rvs_σ[inds_key1, :] .^ 2); dims=1)')))
-# plt = SSOFA.plot_rvs_red_greedy(times_nu, rvs_red, rvs_σ_red, neid_time, neid_rv, neid_rv_σ; title=star_str, inst_str="NEID");
+rvs_red_σ = collect(Iterators.flatten(1 ./ sqrt.(sum(1 ./ (rvs_σ[inds_key1, :] .^ 2); dims=1)')))
+# plt = SSOFA.plot_rvs_red_greedy(times_nu, rvs_red, rvs_red_σ, neid_time, neid_rv, neid_rv_σ; title=star_str, inst_str="NEID");
 
 # filtering out orders with high rms, high σ, or high χ²)
 avgχ² = vec((sum(abs2, (rvs .- rvs_red') ./ rvs_σ; dims=2))) ./ n_obs
@@ -78,9 +79,9 @@ println("$(length(inds)) orders used in total")
 # using filtered orders to get more RV precision
 rvs_red_greedy = collect(Iterators.flatten((sum(rvs[inds, :] ./ (rvs_σ[inds, :] .^ 2); dims=1) ./ sum(1 ./ (rvs_σ[inds, :] .^ 2); dims=1))'))
 rvs_red_greedy .-= median(rvs_red_greedy)
-rvs_σ_red_greedy = collect(Iterators.flatten(1 ./ sqrt.(sum(1 ./ (rvs_σ[inds, :] .^ 2); dims=1)')))
-# plt = SSOFA.plot_rvs_red_greedy(times_nu, rvs_red_greedy, rvs_σ_red_greedy, neid_time, neid_rv, neid_rv_σ; title=star_str, inst_str="NEID", lower_legend=:topright)
-# SSOFA.plot_rvs_red_greedy(times_nu, rvs_red_greedy, rvs_σ_red_greedy, times_nu, rvs_red, rvs_σ_red; title=star_str, inst_str="not greedy");
+rvs_red_greedy_σ = collect(Iterators.flatten(1 ./ sqrt.(sum(1 ./ (rvs_σ[inds, :] .^ 2); dims=1)')))
+# plt = SSOFA.plot_rvs_red_greedy(times_nu, rvs_red_greedy, rvs_red_greedy_σ, neid_time, neid_rv, neid_rv_σ; title=star_str, inst_str="NEID", lower_legend=:topright)
+# SSOFA.plot_rvs_red_greedy(times_nu, rvs_red_greedy, rvs_red_greedy_σ, times_nu, rvs_red, rvs_red_σ; title=star_str, inst_str="not greedy");
 
 # making NEID vs SSOF RV plot
 inst_str="Instrument";
@@ -97,7 +98,7 @@ v_neid_str = L"v^{\textrm{NEID}}_{\star}"
 
 plt = SSOFA.plot_rv(; legend=upper_legend, size=(1920,1080/2))
 scatter!(plt, times_nu, rvs_red_greedy; yerror=rvs_red_greedy_σ, c=SSOFA.plt_colors[2], msc=0.4*SSOFA.plt_colors[2], label=v_ssof_str * " (RMS: $(round(std(rvs_red_greedy), digits=3)), σ: $(round(mean(rvs_red_greedy_σ), digits=3)))", alpha = alpha, msw=msw)
-scatter!(plt, neid_time, neid_rv; yerror=neid_rv_σ, c=SSOFA.plt_colors[1], msc=0.4*SSOFA.plt_colors[1], label=v_neid_str * " (RMS: $(round(std(neid_rv), digits=3)), σ: $(round(mean(neid_rv_σ), digits=3)))", alpha = alpha, msw=msw, title=star_str, ylims=(lo-0.5-(0.25*(hi-lo)),hi+0.5))
+scatter!(plt, neid_time, neid_rv; yerror=neid_rv_σ, c=SSOFA.plt_colors[1], msc=0.4*SSOFA.plt_colors[1], label=v_neid_str * " (RMS: $(round(std(neid_rv), digits=3)), σ: $(round(mean(neid_rv_σ), digits=3)))", alpha = alpha, msw=msw, ylims=(lo-0.5-(0.25*(hi-lo)),hi+0.5))
 
 # outputs
 png(fig_filename)

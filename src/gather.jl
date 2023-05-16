@@ -116,7 +116,8 @@ function order_range(str::String; first_order::Int=7, last_order::Int=118)
 	if length(str) > 0 && str[1] == '[' && str[end] == ']'
 		matches = [parse(Int64, t.match) for t in eachmatch(r"-?[0-9]+", str)]
 		@assert length(matches) == 2 "should only pass things of the form [first_order::Int, last_order::Int]"
-		println("using the input for order range ($first_order:$last_order)")
+		first_order, last_order = matches
+        println("using the input for order range ($first_order:$last_order)")
 
 	# using the defaults
 	else
