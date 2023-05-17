@@ -54,6 +54,7 @@ rvs_std = vec(std(rvs; dims=2))
 best_ords = (searchsortedfirst(wavelength_range[:, 1], 4150) + 3):(searchsortedfirst(wavelength_range[:, 2], SSOF.wavenumber_to_Å(14600)) - 3)
 best_ords = [i for i in best_ords if !(i in [56,57])]  # bad wavelength cal for NEID in these orders
 best_ords_i = order2ind.(best_ords)
+best_ords_i = best_ords_i[.!iszero.(best_ords_i)]
 std_floor = 2 * nm.median(rvs_std[best_ords_i])  # round(8 * std(neid_rv))
 σ_floor = 2 * nm.median(med_rvs_σ[best_ords_i])
 inds_key1 = [i for i in best_ords_i if ((rvs_std[i] < std_floor) && (med_rvs_σ[i] < σ_floor))]
