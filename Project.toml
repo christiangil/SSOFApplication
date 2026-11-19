@@ -1,7 +1,7 @@
 name = "SSOFApplication"
 uuid = "fc75f9f1-43c3-436d-90f8-a4e4bacb1b17"
-authors = ["Chistian Gilbertson <chistianjgilbertson@gmail.com>"]
 version = "0.0.1"
+authors = ["Chistian Gilbertson <chistianjgilbertson@gmail.com>"]
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
@@ -25,6 +25,7 @@ StellarSpectraObservationFitting = "6b1189bd-9150-44f8-8055-f6ca7d16451e"
 CSV = "0.10"
 EchelleCCFs = "0.2.8"
 EchelleInstruments = "0.2.8"
+RvSpectMLBase = "0.2"
 StellarSpectraObservationFitting = ">=0.1.3"
 julia = "1"
 
